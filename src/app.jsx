@@ -35,7 +35,7 @@ import {
 
 import { categories, tools, useCases } from './data/tools.js'
 
-const CONTACT_EMAIL = 'YOUR_EMAIL@example.com'
+const CONTACT_EMAIL = 'vangurijashwanth2@gmail.com'
 
 const iconMap = {
   code: Code2,
