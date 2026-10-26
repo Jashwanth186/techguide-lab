@@ -1,91 +1,227 @@
 
 export const categories = [
-  'All',
+  'All tools',
   'AI Tools',
   'Productivity',
   'Coding',
   'Engineering',
-  'Learning'
+  'Learning',
+  'Research'
 ];
 
 export const tools = [
   {
     id: 'chatgpt',
     name: 'ChatGPT',
+    maker: 'OpenAI',
+    symbol: '✳',
+    accent: 'mint-mark',
     category: 'AI Tools',
-    description: 'Write, learn, brainstorm, and solve problems with AI.',
-    url: 'https://chatgpt.com',
-    free: 'Free plan available'
+    tagline: 'Your AI partner for learning, thinking, and building.',
+    description: 'ChatGPT can explain concepts, brainstorm ideas, write and debug code, analyze supported files, and help plan technical projects.',
+    url: 'https://chatgpt.com/',
+    freePlan: 'A free plan is available. Usage limits and access to advanced models and features may apply.',
+    limitation: 'Free usage is limited, and available models and features can change. Verify important answers and test generated code.',
+    tags: ['AI', 'coding', 'writing', 'learning', 'research'],
+    bestFor: ['Understanding programming concepts', 'Debugging and explaining code', 'Planning technical projects'],
+    useCases: ['Explain a Python error in simple language', 'Create a study plan for electronics', 'Review a small code example']
   },
   {
     id: 'gemini',
     name: 'Google Gemini',
+    maker: 'Google',
+    symbol: '✦',
+    accent: 'violet-mark',
     category: 'AI Tools',
-    description: 'Research topics, understand concepts, and work with AI.',
-    url: 'https://gemini.google.com',
-    free: 'Free plan available'
+    tagline: 'Explore ideas and work through complex questions.',
+    description: 'Gemini is a general-purpose AI assistant for explanations, writing, brainstorming, research support, and supported Google ecosystem tasks.',
+    url: 'https://gemini.google.com/',
+    freePlan: 'A free version is available. Usage and advanced features may be limited.',
+    limitation: 'Some models and advanced features may require a paid plan. Check generated information against reliable sources.',
+    tags: ['AI', 'research', 'writing', 'learning'],
+    bestFor: ['Explaining technical concepts', 'Brainstorming project ideas', 'Summarizing information'],
+    useCases: ['Compare two microcontrollers', 'Explain a difficult engineering topic', 'Create an outline for a technical presentation']
   },
   {
     id: 'claude',
     name: 'Claude',
+    maker: 'Anthropic',
+    symbol: '✺',
+    accent: 'cyan-mark',
     category: 'AI Tools',
-    description: 'Help with writing, reasoning, coding, and documents.',
-    url: 'https://claude.ai',
-    free: 'Free plan available'
+    tagline: 'Think through writing, documents, and code.',
+    description: 'Claude is an AI assistant that can help with writing, reasoning, coding, and working with supported documents.',
+    url: 'https://claude.ai/',
+    freePlan: 'A free plan is available in supported regions, with usage limits.',
+    limitation: 'Usage limits can vary with demand and model choice. Some features are available only on paid plans.',
+    tags: ['AI', 'coding', 'writing', 'documents'],
+    bestFor: ['Reviewing code', 'Improving technical writing', 'Understanding longer documents'],
+    useCases: ['Ask for feedback on a code snippet', 'Improve a project explanation', 'Summarize a technical document']
   },
   {
-    id: 'github',
-    name: 'GitHub',
+    id: 'github-copilot',
+    name: 'GitHub Copilot',
+    maker: 'GitHub',
+    symbol: '⌘',
+    accent: 'violet-mark',
     category: 'Coding',
-    description: 'Store code, manage projects, and collaborate with developers.',
-    url: 'https://github.com',
-    free: 'Free plan available'
+    tagline: 'Get coding assistance inside your development workflow.',
+    description: 'GitHub Copilot provides AI coding assistance in supported development environments, including code suggestions and chat features.',
+    url: 'https://github.com/features/copilot',
+    freePlan: 'A limited free tier is available, subject to current quotas and eligibility.',
+    limitation: 'The free tier has usage limits. Features depend on your plan, editor, and selected model.',
+    tags: ['coding', 'AI', 'debugging', 'development'],
+    bestFor: ['Code completion', 'Understanding unfamiliar code', 'Speeding up routine development'],
+    useCases: ['Generate a function in VS Code', 'Ask about an error in a code file', 'Draft unit tests for a small function']
   },
   {
-    id: 'vscode',
-    name: 'Visual Studio Code',
-    category: 'Coding',
-    description: 'A powerful code editor for web development and programming.',
-    url: 'https://code.visualstudio.com',
-    free: 'Free'
+    id: 'perplexity',
+    name: 'Perplexity',
+    maker: 'Perplexity AI',
+    symbol: '⌕',
+    accent: 'cyan-mark',
+    category: 'Research',
+    tagline: 'Explore questions with web-linked answers.',
+    description: 'Perplexity is an AI-powered search and answer tool that helps explore topics and find links to supporting sources.',
+    url: 'https://www.perplexity.ai/',
+    freePlan: 'A free plan is available, with limits on certain advanced searches and features.',
+    limitation: 'Some advanced research features may be restricted. Always open and verify the cited original sources.',
+    tags: ['research', 'search', 'AI', 'sources'],
+    bestFor: ['Starting research', 'Finding source links', 'Comparing information across websites'],
+    useCases: ['Research a new programming framework', 'Find documentation for a component', 'Explore a technical topic with sources']
   },
   {
     id: 'notebooklm',
     name: 'NotebookLM',
+    maker: 'Google',
+    symbol: '▤',
+    accent: 'mint-mark',
     category: 'Learning',
-    description: 'Study your sources and create useful learning summaries.',
-    url: 'https://notebooklm.google.com',
-    free: 'Free plan available'
+    tagline: 'Study and explore your own reference materials.',
+    description: 'NotebookLM helps users ask questions about supported sources they provide and generate study-oriented summaries and other learning aids.',
+    url: 'https://notebooklm.google.com/',
+    freePlan: 'A free version is available, subject to source and usage limits.',
+    limitation: 'Source counts and feature limits apply. Check generated answers against the original material.',
+    tags: ['learning', 'research', 'documents', 'study'],
+    bestFor: ['Studying course materials', 'Summarizing reference documents', 'Preparing revision notes'],
+    useCases: ['Study a set of lecture notes', 'Create revision questions from a document', 'Summarize a technical reference']
+  },
+  {
+    id: 'vscode',
+    name: 'Visual Studio Code',
+    maker: 'Microsoft',
+    symbol: '</>',
+    accent: 'cyan-mark',
+    category: 'Coding',
+    tagline: 'Build websites and software with a versatile code editor.',
+    description: 'Visual Studio Code is a code editor with extensions, an integrated terminal, debugging support, and tools for many programming languages.',
+    url: 'https://code.visualstudio.com/',
+    freePlan: 'The editor is free to download and use.',
+    limitation: 'Some extensions and external AI services have their own pricing, accounts, or usage limits.',
+    tags: ['coding', 'development', 'programming'],
+    bestFor: ['Writing code', 'Running development tools', 'Debugging projects'],
+    useCases: ['Build a React website', 'Run a project from the integrated terminal', 'Install extensions for a programming language']
+  },
+  {
+    id: 'google-colab',
+    name: 'Google Colab',
+    maker: 'Google',
+    symbol: '◈',
+    accent: 'violet-mark',
+    category: 'Engineering',
+    tagline: 'Experiment with Python in a browser notebook.',
+    description: 'Google Colab lets users write and run Python notebooks in the browser, useful for data analysis, machine learning, and technical experiments.',
+    url: 'https://colab.research.google.com/',
+    freePlan: 'Free notebook access is available, with resource and runtime limits.',
+    limitation: 'Compute availability, session duration, memory, and GPU access are limited and can vary.',
+    tags: ['Python', 'engineering', 'AI', 'machine learning'],
+    bestFor: ['Learning Python', 'Running small experiments', 'Trying data science examples'],
+    useCases: ['Run a Python calculation', 'Plot sample sensor data', 'Try a machine-learning tutorial']
+  },
+  {
+    id: 'huggingface',
+    name: 'Hugging Face',
+    maker: 'Hugging Face',
+    symbol: '🤗',
+    accent: 'mint-mark',
+    category: 'Engineering',
+    tagline: 'Discover open machine-learning models and demos.',
+    description: 'Hugging Face hosts machine-learning models, datasets, libraries, and interactive demos for experimentation and development.',
+    url: 'https://huggingface.co/',
+    freePlan: 'Many resources are publicly accessible. Compute services and some features may have usage limits or charges.',
+    limitation: 'Not every model or hosted demo is free to run without limits. Hardware and access requirements vary.',
+    tags: ['AI', 'models', 'engineering', 'machine learning'],
+    bestFor: ['Exploring AI models', 'Learning machine learning', 'Testing available demos'],
+    useCases: ['Compare text-generation models', 'Explore an image-classification demo', 'Find models for an AI prototype']
   },
   {
     id: 'canva',
     name: 'Canva',
+    maker: 'Canva',
+    symbol: '✿',
+    accent: 'cyan-mark',
     category: 'Productivity',
-    description: 'Create presentations, graphics, and visual designs.',
-    url: 'https://www.canva.com',
-    free: 'Free plan available'
+    tagline: 'Create presentations and visual materials.',
+    description: 'Canva is a design platform for presentations, graphics, posters, and other visual content, with some AI-powered features.',
+    url: 'https://www.canva.com/',
+    freePlan: 'A free plan is available. Some assets and advanced features are paid.',
+    limitation: 'Premium templates, assets, and certain AI features may require a subscription or have usage limits.',
+    tags: ['design', 'presentations', 'productivity', 'AI'],
+    bestFor: ['Preparing presentations', 'Creating project posters', 'Designing simple graphics'],
+    useCases: ['Create a project presentation', 'Design a simple infographic', 'Prepare a poster for a technical event']
   },
   {
     id: 'arduino',
     name: 'Arduino',
+    maker: 'Arduino',
+    symbol: '⌁',
+    accent: 'mint-mark',
     category: 'Engineering',
-    description: 'Explore electronics projects, boards, and programming.',
-    url: 'https://www.arduino.cc',
-    free: 'Free'
+    tagline: 'Prototype electronics and embedded projects.',
+    description: 'Arduino provides hardware platforms, programming tools, and documentation for learning electronics and building interactive prototypes.',
+    url: 'https://www.arduino.cc/',
+    freePlan: 'Core software and many learning resources are free. Hardware must be purchased separately.',
+    limitation: 'Physical boards and components cost money. Some cloud services and features may have separate limits or pricing.',
+    tags: ['electronics', 'embedded', 'engineering', 'coding'],
+    bestFor: ['Learning embedded programming', 'Prototyping sensor systems', 'Building electronics projects'],
+    useCases: ['Read data from a sensor', 'Build a simple LED project', 'Prototype a microcontroller-based device']
   }
 ];
 
 export const useCases = [
   {
     id: 'coding',
+    icon: 'code',
     title: 'Coding & Development',
-    description: 'Find AI tools for writing, debugging, and understanding code.',
-    toolIds: ['chatgpt'],
+    description: 'Find tools for writing, debugging, and understanding code.',
+    tools: ['chatgpt', 'github-copilot', 'vscode', 'claude']
+  },
+  {
+    id: 'research',
+    icon: 'search',
+    title: 'Research & Fact-Finding',
+    description: 'Explore topics and find useful source material.',
+    tools: ['perplexity', 'gemini', 'chatgpt']
   },
   {
     id: 'learning',
-    title: 'Learning & Research',
-    description: 'Discover tools for studying, research, and summarizing information.',
-    toolIds: ['chatgpt', 'notebooklm'],
+    icon: 'book',
+    title: 'Learning & Study',
+    description: 'Study notes, understand concepts, and prepare for exams.',
+    tools: ['notebooklm', 'chatgpt', 'gemini']
   },
+  {
+    id: 'engineering',
+    icon: 'cpu',
+    title: 'Engineering Projects',
+    description: 'Explore electronics, Python, embedded systems, and AI prototypes.',
+    tools: ['arduino', 'google-colab', 'huggingface', 'chatgpt']
+  },
+  {
+    id: 'productivity',
+    icon: 'layers',
+    title: 'Design & Productivity',
+    description: 'Create visual materials and organize project work.',
+    tools: ['canva', 'chatgpt']
+  }
 ];
