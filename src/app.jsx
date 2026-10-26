@@ -8,802 +8,236 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom'
-
-import {
-  ArrowDownRight,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUpRight,
-  BookOpen,
-  Check,
-  ChevronDown,
-  Code2,
-  Cpu,
-  ExternalLink,
-  Filter,
-  FlaskConical,
-  Layers3,
-  Menu,
-  Search,
-  ShieldCheck,
-  Sparkles,
-  Terminal,
-  X,
-  Zap,
-} from 'lucide-react'
-
 import { categories, tools, useCases } from './data/tools.js'
 
-const iconMap = {
-  code: Code2,
-  search: Search,
-  book: BookOpen,
-  cpu: Cpu,
-  terminal: Terminal,
-  layers: Layers3,
-}
-
-function asArray(value) {
-  return Array.isArray(value) ? value : []
+const pageStyle = {
+  maxWidth: '1000px',
+  margin: '0 auto',
+  padding: '48px 24px 72px',
+  lineHeight: 1.8,
 }
 
 function Logo() {
   return (
-    <Link className="brand" to="/" aria-label="TechGuide Lab home">
-      <span className="brand-mark">
-        <FlaskConical size={20} strokeWidth={2.2} />
-      </span>
-      <span>
-        TechGuide <b>Lab</b>
-        <small>THE PRACTICAL AI DIRECTORY</small>
-      </span>
+    <Link to="/" style={{ fontSize: 22, fontWeight: 800, color: 'inherit', textDecoration: 'none' }}>
+      TechGuide <span style={{ color: '#6558e8' }}>Lab</span>
     </Link>
   )
 }
 
 function Header() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const location = useLocation()
-
   return (
-    <header className="site-header">
-      <div className="header-inner">
+    <header style={{ padding: '20px 5%', borderBottom: '1px solid #e5e7eb' }}>
+      <div style={{ maxWidth: 1100, margin: 'auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <Logo />
-
-        <button
-          className="mobile-menu"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <X /> : <Menu />}
-        </button>
-
-        <nav className={menuOpen ? 'nav nav-open' : 'nav'}>
-          <Link
-            className={location.pathname === '/' ? 'nav-link active' : 'nav-link'}
-            to="/"
-            onClick={() => setMenuOpen(false)}
-          >
-            Discover tools
-          </Link>
-
-          <Link
-            className={
-              location.pathname === '/use-cases'
-                ? 'nav-link active'
-                : 'nav-link'
-            }
-            to="/use-cases"
-            onClick={() => setMenuOpen(false)}
-          >
-            Find by task
-          </Link>
-
-          <a
-            className="nav-link"
-            href="/#how-it-works"
-            onClick={() => setMenuOpen(false)}
-          >
-            How it works
-          </a>
+        <nav style={{ display: 'flex', flexWrap: 'wrap', gap: 18 }}>
+          <Link to="/">Discover tools</Link>
+          <Link to="/use-cases">Use cases</Link>
+          <Link to="/about">About</Link>
+          <Link to="/contact">Contact</Link>
+          <Link to="/privacy-policy">Privacy</Link>
         </nav>
-
-        <a
-          className="header-cta"
-          href="https://chatgpt.com/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Try ChatGPT <ArrowUpRight size={16} />
-        </a>
       </div>
     </header>
   )
 }
 
-function ToolLogo({ tool, large = false }) {
-  return (
-    <span
-      className={`tool-logo ${tool.accent || ''} ${
-        large ? 'tool-logo-large' : ''
-      }`}
-      aria-hidden="true"
-    >
-      {tool.symbol || 'AI'}
-    </span>
-  )
-}
+function HomePage() {
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('All tools')
 
-function ToolCard({ tool, index = 0 }) {
+  const filteredTools = useMemo(() => {
+    return tools.filter((tool) => {
+      const matchesCategory = category === 'All tools' || tool.category === category
+      const searchable = [
+        tool.name, tool.maker, tool.category, tool.tagline,
+        tool.description, ...(tool.tags || []),
+      ].join(' ').toLowerCase()
+
+      return matchesCategory && searchable.includes(query.toLowerCase())
+    })
+  }, [query, category])
+
   return (
-    <article
-      className="tool-card"
-      style={{ '--delay': `${Math.min(index, 8) * 45}ms` }}
-    >
-      <div className="tool-card-top">
-        <ToolLogo tool={tool} />
-        <span className="category-pill">{tool.category || 'AI Tools'}</span>
+    <main style={pageStyle}>
+      <p>YOUR PRACTICAL AI TOOLKIT</p>
+      <h1>Find the right AI. Do better work.</h1>
+      <p>Explore AI tools for coding, research, engineering, productivity, and learning.</p>
+
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search AI tools..."
+        aria-label="Search AI tools"
+        style={{ width: '100%', maxWidth: 500, padding: 12, margin: '16px 0', boxSizing: 'border-box' }}
+      />
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+        {(categories || ['All tools']).map((item) => (
+          <button key={item} onClick={() => setCategory(item)} style={{ padding: '8px 12px', cursor: 'pointer' }}>
+            {item}
+          </button>
+        ))}
       </div>
 
-      <div className="tool-maker">{tool.maker || 'AI Tool Provider'}</div>
-
-      <h3>
-        <Link to={`/tools/${tool.id}`}>{tool.name}</Link>
-      </h3>
-
-      <p className="tool-tagline">
-        {tool.tagline || tool.description || 'Explore this useful AI tool.'}
-      </p>
-
-      <div className="card-footer">
-        <span className="free-label">
-          <span className="free-dot" />
-          Free access available
-        </span>
-
-        <Link
-          className="circle-link"
-          to={`/tools/${tool.id}`}
-          aria-label={`View ${tool.name}`}
-        >
-          <ArrowUpRight size={18} />
-        </Link>
+      <h2>{filteredTools.length} tools to explore</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 16 }}>
+        {filteredTools.map((tool) => (
+          <article key={tool.id} style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: 20 }}>
+            <p>{tool.category}</p>
+            <h3><Link to={`/tools/${tool.id}`}>{tool.name}</Link></h3>
+            <p>{tool.tagline || tool.description}</p>
+            <p>{tool.maker}</p>
+            <Link to={`/tools/${tool.id}`}>View tool →</Link>
+          </article>
+        ))}
       </div>
-    </article>
+    </main>
   )
 }
 
 function ToolDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-
   const tool = tools.find((item) => item.id === id)
 
   if (!tool) {
-    return (
-      <main className="page-shell not-found">
-        <div className="eyebrow">404 / TOOL NOT FOUND</div>
-        <h1>That tool isn't in our directory yet.</h1>
-        <Link className="button button-dark" to="/">
-          Explore all tools <ArrowRight size={17} />
-        </Link>
-      </main>
-    )
+    return <main style={pageStyle}><h1>Tool not found</h1><Link to="/">Explore tools</Link></main>
   }
 
-  const toolTags = asArray(tool.tags)
-
-  const related = tools
-    .filter((item) => {
-      if (item.id === tool.id) return false
-
-      const sameCategory = item.category === tool.category
-
-      const sharedTag = asArray(item.tags).some((tag) =>
-        toolTags.includes(tag)
-      )
-
-      return sameCategory || sharedTag
-    })
-    .slice(0, 3)
-
   return (
-    <main className="page-shell detail-page">
-      <button className="back-link" onClick={() => navigate(-1)}>
-        <ArrowLeft size={16} /> Back to discovery
-      </button>
+    <main style={pageStyle}>
+      <button onClick={() => navigate(-1)}>← Back</button>
+      <p>{tool.category}</p>
+      <h1>{tool.name}</h1>
+      <p>{tool.maker}</p>
+      <p>{tool.description || tool.tagline}</p>
 
-      <section className="detail-hero">
-        <div className="detail-heading">
-          <div className="detail-brand">
-            <ToolLogo tool={tool} large />
+      <h2>What it's useful for</h2>
+      <ul>{(tool.bestFor || []).map((item) => <li key={item}>{item}</li>)}</ul>
 
-            <div>
-              <span className="eyebrow">
-                {tool.maker || 'AI Tool Provider'}
-              </span>
-              <h1>{tool.name}</h1>
-            </div>
-          </div>
+      <h2>Example tasks</h2>
+      <ul>{(tool.useCases || []).map((item) => <li key={item}>{item}</li>)}</ul>
 
-          <p className="detail-tagline">
-            {tool.tagline || 'Explore this AI tool.'}
-          </p>
+      <h2>Free plan and limitations</h2>
+      <p>{tool.freePlan || 'Check the provider website for current pricing and free-plan details.'}</p>
+      <p>{tool.limitation || 'Features and usage limits may change. Verify details with the provider.'}</p>
 
-          <p className="detail-description">
-            {tool.description || 'Explore the official website for details.'}
-          </p>
-
-          <a
-            className="button button-dark"
-            href={tool.url || 'https://chatgpt.com/'}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Visit official website <ExternalLink size={17} />
-          </a>
-        </div>
-
-        <aside className="free-panel">
-          <span className="free-panel-icon">
-            <Check size={18} />
-          </span>
-
-          <span className="eyebrow">PRICING SNAPSHOT</span>
-          <h2>Free access available</h2>
-
-          <p>
-            {tool.freePlan ||
-              'Check the official provider website for current pricing and limits.'}
-          </p>
-
-          <div className="fine-print">
-            <ShieldCheck size={16} />
-            Free features and limits may change. Confirm details with the
-            provider.
-          </div>
-        </aside>
-      </section>
-
-      <div className="detail-grid">
-        <section className="content-panel">
-          <div className="section-kicker">01 / WHAT IT'S GOOD FOR</div>
-          <h2>Put it to work</h2>
-
-          <ul className="check-list">
-            {asArray(tool.bestFor).map((item) => (
-              <li key={item}>
-                <Check size={17} />
-                {item}
-              </li>
-            ))}
-
-            {asArray(tool.bestFor).length === 0 && (
-              <li>
-                <Check size={17} />
-                Explore the tool's features on its official website.
-              </li>
-            )}
-          </ul>
-
-          <div className="section-kicker section-kicker-spaced">
-            02 / TRY THESE TASKS
-          </div>
-
-          <div className="example-list">
-            {asArray(tool.useCases).map((item, index) => (
-              <div className="example-row" key={item}>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <p>{item}</p>
-              </div>
-            ))}
-
-            {asArray(tool.useCases).length === 0 && (
-              <div className="example-row">
-                <span>01</span>
-                <p>Visit the official website and explore its main features.</p>
-              </div>
-            )}
-          </div>
-        </section>
-
-        <aside className="content-panel limitation-panel">
-          <div className="section-kicker">03 / GOOD TO KNOW</div>
-          <h2>Know the limits</h2>
-
-          <p>
-            {tool.limitation ||
-              'Features, pricing, and usage limits can change. Verify important information with the provider.'}
-          </p>
-
-          <div className="notice-box">
-            <ShieldCheck size={18} />
-            <span>
-              Use AI as a helper, not the final authority. Check important
-              facts and test technical work.
-            </span>
-          </div>
-
-          <div className="tag-list">
-            {toolTags.map((tag) => (
-              <span key={tag}>#{String(tag).replaceAll(' ', '')}</span>
-            ))}
-          </div>
-        </aside>
-      </div>
-
-      {related.length > 0 && (
-        <section className="related-section">
-          <div className="section-heading">
-            <div>
-              <div className="eyebrow">KEEP EXPLORING</div>
-              <h2>Tools worth comparing</h2>
-            </div>
-
-            <Link to="/" className="text-link">
-              All tools <ArrowRight size={16} />
-            </Link>
-          </div>
-
-          <div className="tool-grid related-grid">
-            {related.map((item, index) => (
-              <ToolCard key={item.id} tool={item} index={index} />
-            ))}
-          </div>
-        </section>
-      )}
+      <p>
+        <a href={tool.url || 'https://chatgpt.com/'} target="_blank" rel="noreferrer">
+          Visit official website ↗
+        </a>
+      </p>
     </main>
   )
 }
 
 function UseCasesPage() {
   return (
-    <main className="page-shell usecase-page">
-      <div className="eyebrow">A BETTER PLACE TO START</div>
-
-      <h1>What are you trying to do?</h1>
-
-      <p className="page-intro">
-        Choose a task to see tools that can help. You don't need to know the
-        AI product names first.
-      </p>
-
-      <div className="usecase-grid">
-        {useCases.map((item, index) => {
-          const Icon = iconMap[item.icon] || Sparkles
-
-          return (
-            <article className="usecase-card" key={item.title}>
-              <span className="usecase-icon">
-                <Icon size={22} />
-              </span>
-
-              <span className="usecase-number">
-                TASK {String(index + 1).padStart(2, '0')}
-              </span>
-
-              <h2>{item.title}</h2>
-              <p>{item.description}</p>
-
-              <div className="usecase-tools">
-                {asArray(item.tools).map((toolId) => {
-                  const tool = tools.find((entry) => entry.id === toolId)
-
-                  return tool ? (
-                    <Link key={toolId} to={`/tools/${toolId}`}>
-                      {tool.name} <ArrowUpRight size={13} />
-                    </Link>
-                  ) : null
-                })}
-              </div>
-            </article>
-          )
-        })}
-      </div>
+    <main style={pageStyle}>
+      <h1>Find AI tools by task</h1>
+      <p>Start with what you want to accomplish.</p>
+      {(useCases || []).map((item) => (
+        <section key={item.title} style={{ borderBottom: '1px solid #e5e7eb', padding: '16px 0' }}>
+          <h2>{item.title}</h2>
+          <p>{item.description}</p>
+          {(item.tools || []).map((id) => {
+            const tool = tools.find((entry) => entry.id === id)
+            return tool ? <p key={id}><Link to={`/tools/${id}`}>{tool.name} →</Link></p> : null
+          })}
+        </section>
+      ))}
     </main>
   )
 }
 
-function HomePage() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [activeCategory, setActiveCategory] = useState('All tools')
-  const [showAll, setShowAll] = useState(false)
-  const [sortBy, setSortBy] = useState('recommended')
-
-  const safeTools = asArray(tools)
-  const safeCategories = asArray(categories)
-
-  const filteredTools = useMemo(() => {
-    const query = searchTerm.trim().toLowerCase()
-
-    let result = safeTools.filter((tool) => {
-      const matchesCategory =
-        activeCategory === 'All tools' || tool.category === activeCategory
-
-      const searchable = [
-        tool.name,
-        tool.maker,
-        tool.category,
-        tool.tagline,
-        tool.description,
-        ...asArray(tool.tags),
-        ...asArray(tool.bestFor),
-        ...asArray(tool.useCases),
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-
-      return matchesCategory && (!query || searchable.includes(query))
-    })
-
-    if (sortBy === 'az') {
-      result = [...result].sort((a, b) =>
-        (a.name || '').localeCompare(b.name || '')
-      )
-    }
-
-    return result
-  }, [searchTerm, activeCategory, sortBy])
-
-  const displayedTools =
-    showAll || searchTerm || activeCategory !== 'All tools'
-      ? filteredTools
-      : filteredTools.slice(0, 8)
-
-  function chooseCategory(category) {
-    setActiveCategory(category)
-    setShowAll(true)
-  }
-
+function AboutPage() {
   return (
-    <main>
-      <section className="hero">
-        <div className="hero-grid">
-          <div className="hero-copy">
-            <div className="hero-badge">
-              <span className="badge-pulse" />
-              YOUR PRACTICAL AI TOOLKIT
-            </div>
+    <main style={pageStyle}>
+      <p>ABOUT TECHGUIDE LAB</p>
+      <h1>Making AI easier to understand and use.</h1>
+      <p>TechGuide Lab is an independent directory that helps people discover AI tools for coding, research, engineering, productivity, and learning.</p>
 
-            <h1>
-              Find the right AI.
-              <br />
-              <span>Do better work.</span>
-            </h1>
+      <h2>Our mission</h2>
+      <p>We aim to make AI tool discovery simpler by organizing tools around their uses and helping visitors find official provider websites.</p>
 
-            <p className="hero-description">
-              A clear, curated guide to useful AI tools for coding, research,
-              engineering and learning — including what you can use for free.
-            </p>
+      <h2>What you'll find here</h2>
+      <ul>
+        <li>AI tools organized by category and purpose.</li>
+        <li>Practical information about features and use cases.</li>
+        <li>Guidance for students, developers, and learners.</li>
+        <li>Links to providers so visitors can verify current details.</li>
+      </ul>
 
-            <div className="hero-actions">
-              <a className="button button-dark" href="#directory">
-                Explore the directory <ArrowDownRight size={17} />
-              </a>
+      <h2>Our approach</h2>
+      <p>We aim to provide clear and useful information. Features, prices, and free-plan limits may change. Verify important details with providers and review AI-generated information before relying on it.</p>
 
-              <Link className="button button-light" to="/use-cases">
-                Find tools by task <ArrowRight size={17} />
-              </Link>
-            </div>
+      <h2>Independence</h2>
+      <p>TechGuide Lab is an independent project. A listing does not necessarily mean the provider endorses or sponsors this website.</p>
+      <p>Questions? <Link to="/contact">Contact us</Link>.</p>
+    </main>
+  )
+}
 
-            <div className="hero-proof">
-              <div className="avatar-stack">
-                <span>AI</span>
-                <span>{'</>'}</span>
-                <span>⚙</span>
-              </div>
+function ContactPage() {
+  return (
+    <main style={pageStyle}>
+      <h1>Contact Us</h1>
+      <p>Have feedback, found an incorrect tool detail, or want to suggest an AI tool? We'd like to hear from you.</p>
+      <p>Email us at: <a href="mailto:vangurijashwanth2@gmail.com">vangurijashwanth2@gmail.com</a></p>
+      <p>Please include the relevant tool name and a description of your question or correction.</p>
+    </main>
+  )
+}
 
-              <p>
-                <b>Less hype. More useful.</b>
-                <br />
-                Practical notes for real projects.
-              </p>
-            </div>
-          </div>
+function PrivacyPolicyPage() {
+  return (
+    <main style={pageStyle}>
+      <h1>Privacy Policy</h1>
+      <p><strong>Last updated: October 26, 2026</strong></p>
 
-          <div className="hero-visual">
-            <div className="visual-orbit orbit-one" />
-            <div className="visual-orbit orbit-two" />
+      <h2>Introduction</h2>
+      <p>TechGuide Lab respects your privacy. This policy explains how information may be handled when you visit this website.</p>
 
-            <div className="visual-center">
-              <span className="visual-spark">
-                <Sparkles size={28} />
-              </span>
-              <span>AI</span>
-              <small>TOOLKIT</small>
-            </div>
+      <h2>Information you provide</h2>
+      <p>This website does not currently require visitors to create an account. If you contact us by email, we receive the information you choose to include in your message.</p>
 
-            <div className="float-chip chip-chat">
-              <span className="mini-mark mint-mark">✳</span>
-              <div>
-                <b>ChatGPT</b>
-                <small>Learn & build</small>
-              </div>
-              <span className="chip-check">
-                <Check size={13} />
-              </span>
-            </div>
+      <h2>Cookies and usage data</h2>
+      <p>Our hosting provider or third-party services may process technical information such as browser details, requests, and basic usage data to operate, protect, and improve the website.</p>
 
-            <div className="float-chip chip-code">
-              <span className="mini-mark violet-mark">⌘</span>
-              <div>
-                <b>Copilot</b>
-                <small>Write better code</small>
-              </div>
-            </div>
+      <h2>Advertising and Google AdSense</h2>
+      <p>If advertising services such as Google AdSense are enabled in the future, Google and its partners may use cookies or similar technologies to serve, measure, and personalize advertisements as permitted by applicable settings and law.</p>
+      <p>Visitors can learn about Google's advertising practices and available controls through Google's advertising privacy resources.</p>
 
-            <div className="float-chip chip-research">
-              <span className="mini-mark cyan-mark">⌕</span>
-              <div>
-                <b>Research</b>
-                <small>Find reliable sources</small>
-              </div>
-            </div>
+      <h2>Third-party websites</h2>
+      <p>Our directory links to third-party websites. Those websites have their own privacy policies and practices, which we do not control.</p>
 
-            <div className="visual-caption">
-              <span className="caption-dot" />
-              A smarter starting point
-            </div>
-          </div>
-        </div>
+      <h2>Data security and children's privacy</h2>
+      <p>We take reasonable steps to operate the website responsibly, but no online service can guarantee absolute security. This website is not intended to knowingly collect personal information from children through account registration.</p>
 
-        <div className="hero-bottom">
-          <span>BUILT FOR CURIOUS MINDS</span>
-          <div>
-            <span>Students</span>
-            <span>Developers</span>
-            <span>Builders</span>
-            <span>Problem-solvers</span>
-          </div>
-        </div>
-      </section>
+      <h2>Changes to this policy</h2>
+      <p>We may update this policy as the website changes. Updates will be published on this page.</p>
 
-      <section className="directory-section page-shell" id="directory">
-        <div className="section-heading directory-heading">
-          <div>
-            <div className="eyebrow">THE DIRECTORY</div>
-            <h2>Meet your new toolkit.</h2>
-            <p>
-              Useful tools, clearly explained. Start with the task, not the
-              hype.
-            </p>
-          </div>
-
-          <div className="tool-count">
-            <b>{String(safeTools.length).padStart(2, '0')}</b>
-            <span>
-              TOOLS TO
-              <br />
-              EXPLORE
-            </span>
-          </div>
-        </div>
-
-        <div className="search-row">
-          <label className="search-box">
-            <Search size={19} />
-
-            <input
-              value={searchTerm}
-              onChange={(event) => {
-                setSearchTerm(event.target.value)
-                setShowAll(true)
-              }}
-              placeholder="Search tools, tasks, or skills..."
-              aria-label="Search tools"
-            />
-
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                aria-label="Clear search"
-                type="button"
-              >
-                <X size={16} />
-              </button>
-            )}
-
-            <kbd>⌘ K</kbd>
-          </label>
-
-          <label className="sort-control">
-            <Filter size={16} />
-            <span className="sort-label">Sort</span>
-
-            <select
-              value={sortBy}
-              onChange={(event) => setSortBy(event.target.value)}
-              aria-label="Sort tools"
-            >
-              <option value="recommended">Recommended</option>
-              <option value="az">A to Z</option>
-            </select>
-
-            <ChevronDown size={14} />
-          </label>
-        </div>
-
-        <div className="category-row" role="group" aria-label="Filter by category">
-          {safeCategories.map((category) => (
-            <button
-              key={category}
-              className={
-                activeCategory === category
-                  ? 'category-button selected'
-                  : 'category-button'
-              }
-              onClick={() => chooseCategory(category)}
-            >
-              {category}
-              {category === 'All tools' && <span>{safeTools.length}</span>}
-            </button>
-          ))}
-        </div>
-
-        <div className="results-line">
-          <span>
-            {filteredTools.length}{' '}
-            {filteredTools.length === 1 ? 'tool' : 'tools'} found
-          </span>
-          <span>Independent guide · No account needed</span>
-        </div>
-
-        {displayedTools.length > 0 ? (
-          <div className="tool-grid">
-            {displayedTools.map((tool, index) => (
-              <ToolCard key={tool.id} tool={tool} index={index} />
-            ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <Search size={28} />
-            <h3>No tools found</h3>
-            <p>Try another search or clear your category filter.</p>
-
-            <button
-              className="button button-dark"
-              onClick={() => {
-                setSearchTerm('')
-                setActiveCategory('All tools')
-                setShowAll(false)
-              }}
-            >
-              Reset filters
-            </button>
-          </div>
-        )}
-
-        {!showAll && filteredTools.length > displayedTools.length && (
-          <div className="load-more-wrap">
-            <button
-              className="button button-outline"
-              onClick={() => setShowAll(true)}
-            >
-              Explore all {filteredTools.length} tools{' '}
-              <ArrowRight size={17} />
-            </button>
-          </div>
-        )}
-      </section>
-
-      <section className="usecase-band">
-        <div className="page-shell usecase-band-inner">
-          <div className="usecase-intro">
-            <div className="eyebrow eyebrow-light">START WITH YOUR GOAL</div>
-
-            <h2>
-              Not sure which tool
-              <br />
-              you need?
-            </h2>
-
-            <p>
-              Tell us what you're working on. We'll point you toward a useful
-              place to start.
-            </p>
-
-            <Link to="/use-cases" className="button button-white">
-              Find by task <ArrowRight size={17} />
-            </Link>
-          </div>
-
-          <div className="quick-tasks">
-            {asArray(useCases).slice(0, 4).map((item) => {
-              const Icon = iconMap[item.icon] || Zap
-
-              return (
-                <Link
-                  className="quick-task"
-                  to="/use-cases"
-                  key={item.title}
-                >
-                  <span className="quick-task-icon">
-                    <Icon size={19} />
-                  </span>
-
-                  <span>
-                    <b>{item.title}</b>
-                    <small>{item.description}</small>
-                  </span>
-
-                  <ArrowUpRight size={17} className="quick-arrow" />
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="how-section page-shell" id="how-it-works">
-        <div className="section-heading">
-          <div>
-            <div className="eyebrow">OUR APPROACH</div>
-            <h2>Clarity over complexity.</h2>
-            <p>
-              AI should help you get moving, not make things more confusing.
-            </p>
-          </div>
-        </div>
-
-        <div className="principle-grid">
-          <article>
-            <span className="principle-icon">
-              <Search size={21} />
-            </span>
-            <span className="principle-no">01</span>
-            <h3>Find what fits</h3>
-            <p>Search by tool, task, or the problem you're trying to solve.</p>
-          </article>
-
-          <article>
-            <span className="principle-icon">
-              <BookOpen size={21} />
-            </span>
-            <span className="principle-no">02</span>
-            <h3>Understand the trade-offs</h3>
-            <p>Know what a tool does and where its free plan has limits.</p>
-          </article>
-
-          <article>
-            <span className="principle-icon">
-              <ShieldCheck size={21} />
-            </span>
-            <span className="principle-no">03</span>
-            <h3>Verify before you trust</h3>
-            <p>Check important claims, especially in code and engineering.</p>
-          </article>
-        </div>
-      </section>
+      <h2>Contact</h2>
+      <p>For privacy questions, email <a href="mailto:vangurijashwanth2@gmail.com">vangurijashwanth2@gmail.com</a>.</p>
     </main>
   )
 }
 
 function Footer() {
   return (
-    <footer className="site-footer">
-      <div className="footer-main page-shell">
+    <footer style={{ borderTop: '1px solid #e5e7eb', padding: '28px 5%', lineHeight: 2 }}>
+      <div style={{ maxWidth: 1100, margin: 'auto' }}>
         <Logo />
-
-        <p>
-          A practical starting point for exploring AI tools.
-          <br />
-          Built for people who want to learn, make and solve.
-        </p>
-
-        <div className="footer-links">
+        <p>An independent starting point for exploring AI tools.</p>
+        <nav style={{ display: 'flex', flexWrap: 'wrap', gap: 18 }}>
           <Link to="/">Discover</Link>
           <Link to="/use-cases">Use cases</Link>
-          <a href="https://chatgpt.com/" target="_blank" rel="noreferrer">
-            ChatGPT <ArrowUpRight size={13} />
-          </a>
-        </div>
-      </div>
-
-      <div className="footer-bottom page-shell">
-        <span>© {new Date().getFullYear()} TechGuide Lab</span>
-        <span>Independent directory · No database · No account required</span>
-        <span>Free-plan details can change; verify with providers.</span>
+          <Link to="/about">About Us</Link>
+          <Link to="/contact">Contact Us</Link>
+          <Link to="/privacy-policy">Privacy Policy</Link>
+        </nav>
+        <p>© {new Date().getFullYear()} TechGuide Lab. Tool details may change; verify with providers.</p>
       </div>
     </footer>
   )
@@ -813,28 +247,17 @@ export default function App() {
   const location = useLocation()
 
   return (
-    <div className="app-shell" key={location.pathname}>
+    <div key={location.pathname}>
       <Header />
-
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/tools/:id" element={<ToolDetail />} />
         <Route path="/use-cases" element={<UseCasesPage />} />
-
-        <Route
-          path="*"
-          element={
-            <main className="page-shell not-found">
-              <div className="eyebrow">404 / PAGE NOT FOUND</div>
-              <h1>Looks like this page wandered off.</h1>
-              <Link className="button button-dark" to="/">
-                Back to TechGuide Lab <ArrowRight size={17} />
-              </Link>
-            </main>
-          }
-        />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="*" element={<main style={pageStyle}><h1>Page not found</h1><Link to="/">Return home</Link></main>} />
       </Routes>
-
       <Footer />
     </div>
   )
