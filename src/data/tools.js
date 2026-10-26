@@ -74,3 +74,18 @@ export const tools = [
     free: 'Free'
   }
 ];
+
+export const useCases = [
+  {
+    id: 'coding',
+    title: 'Coding & Development',
+    description: 'Find AI tools for writing, debugging, and understanding code.',
+    toolIds: ['chatgpt'],
+  },
+  {
+    id: 'learning',
+    title: 'Learning & Research',
+    description: 'Discover tools for studying, research, and summarizing information.',
+    toolIds: ['chatgpt', 'notebooklm'],
+  },
+];
