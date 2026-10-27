@@ -1,4 +1,3 @@
-
 <section className="directory-section page-shell" id="directory">
   <div className="section-heading directory-heading">
     <div>
