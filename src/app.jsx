@@ -1,4 +1,3 @@
-
 import { useMemo, useState } from 'react'
 import {
   Link,
@@ -490,7 +489,6 @@ function AboutPage() {
     </main>
   )
 }
-
 /* -------------------- CONTACT PAGE -------------------- */
 
 function ContactPage() {
@@ -526,13 +524,6 @@ function ContactPage() {
           >
             Send an email <ArrowUpRight size={17} />
           </a>
-
-          {CONTACT_EMAIL === 'YOUR_EMAIL@example.com' && (
-            <p className="fine-print">
-              Website owner: replace the placeholder email in src/app.jsx
-              with your real contact email before publishing.
-            </p>
-          )}
         </article>
 
         <article className="content-panel contact-card">
@@ -936,23 +927,10 @@ function HomePage() {
           </div>
         </div>
       </section>
-
-      <section className="directory-section page-shell" id="directory">
-        <div className="section-heading directory-heading">
-          <div>
-            <div className="eyebrow">THE DIRECTORY</div>
-            <h2>Meet your new toolkit.</h2>
-            <p>
-              Useful tools, clearly explained. Start with the task, not
-              the hype.
-            </p>
-          </div>
-
-          <div className="tool-count">
-            <b>{safeTools.length.toString().padStart(2, '0')}</b>
-            <span>
-              TOOLS TO
-              <br />
+                    <br />
+              EXPLORE
+            </span>
+                  <br />
               EXPLORE
             </span>
           </div>
@@ -1002,7 +980,11 @@ function HomePage() {
           </label>
         </div>
 
-        <div className="category-row" role="group" aria-label="Filter by category">
+        <div
+          className="category-row"
+          role="group"
+          aria-label="Filter by category"
+        >
           {safeCategories.map((category) => (
             <button
               key={category}
@@ -1223,6 +1205,9 @@ export default function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+
+        {/* Legacy URL used in the sitemap */}
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
 
         <Route
           path="*"
