@@ -1,123 +1,653 @@
-import { useEffect, useMemo, useState } from 'react';
 
-const TOOLS = [
-  { id: 'resume-builder', name: 'Resume Builder', category: 'Career', description: 'Create a clear, professional resume for your next opportunity.', tag: 'Career' },
-  { id: 'word-counter', name: 'Word Counter', category: 'Writing', description: 'Count words, characters, and paragraphs in your text.', tag: 'Writing' },
-  { id: 'password-generator', name: 'Password Generator', category: 'Security', description: 'Generate a strong random password right in your browser.', tag: 'Security' },
-  { id: 'percentage-calculator', name: 'Percentage Calculator', category: 'Calculators', description: 'Calculate percentages, discounts, and percentage changes.', tag: 'Math' },
-  { id: 'study-planner', name: 'Study Planner', category: 'Education', description: 'Organize study tasks and build a simple daily plan.', tag: 'Study' },
-  { id: 'unit-converter', name: 'Unit Converter', category: 'Calculators', description: 'Convert common length, weight, and temperature units.', tag: 'Math' },
-  { id: 'bio-generator', name: 'Bio Idea Generator', category: 'Writing', description: 'Get inspiration for a short profile or social bio.', tag: 'Writing' },
-  { id: 'focus-timer', name: 'Focus Timer', category: 'Productivity', description: 'Use focused work sessions with a simple timer.', tag: 'Focus' },
-];
+import { useMemo, useState } from 'react';
+import {
+  Link,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
+import {
+  ArrowDownRight,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  BookOpen,
+  Check,
+  ChevronDown,
+  Code2,
+  Cpu,
+  ExternalLink,
+  Filter,
+  FlaskConical,
+  Layers3,
+  Menu,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Terminal,
+  X,
+  Zap,
+} from 'lucide-react';
+import { categories, tools, useCases } from './data/tools.js';
 
-const CATEGORIES = ['All tools', 'Calculators', 'Career', 'Education', 'Productivity', 'Security', 'Writing'];
+const iconMap = {
+  code: Code2,
+  search: Search,
+  book: BookOpen,
+  cpu: Cpu,
+  terminal: Terminal,
+  layers: Layers3,
+};
+
+function Logo() {
+  return (
+    <Link className="brand" to="/" aria-label="TechGuide Lab home">
+      <span className="brand-mark">
+        <FlaskConical size={20} strokeWidth={2.2} />
+      </span>
+      <span>
+        TechGuide <b>Lab</b>
+        <small>THE PRACTICAL AI DIRECTORY</small>
+      </span>
+    </Link>
+  );
+}
 
 function Header() {
-  return <header className="site-header"><a className="brand" href="/" aria-label="TechGuide Lab home"><span className="brand-mark">T</span><span>TechGuide <b>Lab</b></span></a><nav aria-label="Main navigation"><a href="/">Home</a><a href="/#directory">Explore tools</a><a href="/about/">About</a><a href="/contact/">Contact</a></nav></header>;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  return (
+    <header className="site-header">
+      <div className="header-inner">
+        <Logo />
+        <button
+          className="mobile-menu"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? <X /> : <Menu />}
+        </button>
+
+        <nav className={menuOpen ? 'nav nav-open' : 'nav'}>
+          <Link
+            className={location.pathname === '/' ? 'nav-link active' : 'nav-link'}
+            to="/"
+            onClick={() => setMenuOpen(false)}
+          >
+            Discover tools
+          </Link>
+          <Link
+            className={location.pathname === '/use-cases' ? 'nav-link active' : 'nav-link'}
+            to="/use-cases"
+            onClick={() => setMenuOpen(false)}
+          >
+            Find by task
+          </Link>
+          <a
+            className="nav-link"
+            href="/#how-it-works"
+            onClick={() => setMenuOpen(false)}
+          >
+            How it works
+          </a>
+        </nav>
+
+        <a
+          className="header-cta"
+          href="https://chatgpt.com/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Try ChatGPT <ArrowUpRight size={16} />
+        </a>
+      </div>
+    </header>
+  );
 }
 
-function Footer() {
-  return <footer className="site-footer"><div className="footer-brand"><span className="brand-mark">T</span><span>TechGuide Lab</span></div><p>Simple, useful tools for everyday tasks.</p><div className="footer-links"><a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="/contact/">Contact</a></div><small>© {new Date().getFullYear()} TechGuide Lab. All rights reserved.</small></footer>;
+function ToolLogo({ tool, large = false }) {
+  return (
+    <span
+      className={`tool-logo ${tool.accent || ''} ${large ? 'tool-logo-large' : ''}`}
+      aria-hidden="true"
+    >
+      {tool.symbol}
+    </span>
+  );
 }
 
-function ToolCard({ tool }) {
-  return <article className="tool-card"><div className="tool-card-top"><span className="tool-icon">{tool.name.slice(0, 1)}</span><span className="pill">{tool.tag}</span></div><h3>{tool.name}</h3><p>{tool.description}</p><a className="text-link" href={`/tools/${tool.id}/`}>Open tool <span aria-hidden="true">↗</span></a></article>;
+function ToolCard({ tool, index = 0 }) {
+  return (
+    <article
+      className="tool-card"
+      style={{ '--delay': `${Math.min(index, 8) * 45}ms` }}
+    >
+      <div className="tool-card-top">
+        <ToolLogo tool={tool} />
+        <span className="category-pill">{tool.category}</span>
+      </div>
+
+      <div className="tool-maker">{tool.maker}</div>
+      <h3>
+        <Link to={`/tools/${tool.id}`}>{tool.name}</Link>
+      </h3>
+      <p className="tool-tagline">{tool.tagline}</p>
+
+      <div className="card-footer">
+        <span className="free-label">
+          <span className="free-dot" />
+          Free access available
+        </span>
+        <Link
+          className="circle-link"
+          to={`/tools/${tool.id}`}
+          aria-label={`View ${tool.name}`}
+        >
+          <ArrowUpRight size={18} />
+        </Link>
+      </div>
+    </article>
+  );
 }
 
-function Directory() {
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('All tools');
-  const filteredTools = useMemo(() => TOOLS.filter((tool) => {
-    const matchesCategory = category === 'All tools' || tool.category === category;
-    const searchable = `${tool.name} ${tool.category} ${tool.description}`.toLowerCase();
-    return matchesCategory && searchable.includes(query.trim().toLowerCase());
-  }), [query, category]);
+function ToolDetail() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const tool = tools.find((item) => item.id === id);
 
-  return <section className="directory section" id="directory"><div className="section-heading"><div><span className="eyebrow">THE DIRECTORY</span><h2>Meet your new toolkit.</h2><p>Useful tools, clearly explained. Start with the task, not the hype.</p></div><span className="tool-total"><b>{String(filteredTools.length).padStart(2, '0')}</b><small>TOOLS FOUND</small></span></div><div className="search-row"><label className="search-box"><span aria-hidden="true">⌕</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search tools by name or task…" aria-label="Search tools" /></label></div><div className="category-list" aria-label="Filter by category">{CATEGORIES.map((item) => <button key={item} className={category === item ? 'category active' : 'category'} onClick={() => setCategory(item)} type="button">{item}</button>)}</div>{filteredTools.length ? <div className="tools-grid">{filteredTools.map((tool) => <ToolCard key={tool.id} tool={tool} />)}</div> : <div className="empty-state"><h3>No matching tools</h3><p>Try another search or choose a different category.</p><button className="button button-secondary" onClick={() => { setQuery(''); setCategory('All tools'); }} type="button">Clear filters</button></div>}</section>;
+  if (!tool) {
+    return (
+      <main className="page-shell not-found">
+        <div className="eyebrow">404 / TOOL NOT FOUND</div>
+        <h1>That tool isn't in our directory yet.</h1>
+        <Link className="button button-dark" to="/">
+          Explore all tools <ArrowRight size={17} />
+        </Link>
+      </main>
+    );
+  }
+
+  const related = tools
+    .filter(
+      (item) =>
+        item.id !== tool.id &&
+        (item.category === tool.category ||
+          item.tags.some((tag) => tool.tags.includes(tag)))
+    )
+    .slice(0, 3);
+
+  return (
+    <main className="page-shell detail-page">
+      <button className="back-link" onClick={() => navigate(-1)}>
+        <ArrowLeft size={16} /> Back to discovery
+      </button>
+
+      <section className="detail-hero">
+        <div className="detail-heading">
+          <div className="detail-brand">
+            <ToolLogo tool={tool} large />
+            <div>
+              <span className="eyebrow">{tool.maker}</span>
+              <h1>{tool.name}</h1>
+            </div>
+          </div>
+          <p className="detail-tagline">{tool.tagline}</p>
+          <p className="detail-description">{tool.description}</p>
+          <a
+            className="button button-dark"
+            href={tool.url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Visit official website <ExternalLink size={17} />
+          </a>
+        </div>
+
+        <aside className="free-panel">
+          <span className="free-panel-icon"><Check size={18} /></span>
+          <span className="eyebrow">PRICING SNAPSHOT</span>
+          <h2>Free access available</h2>
+          <p>{tool.freePlan}</p>
+          <div className="fine-print">
+            <ShieldCheck size={16} />
+            Free features and limits may change. Confirm details with the provider.
+          </div>
+        </aside>
+      </section>
+
+      <div className="detail-grid">
+        <section className="content-panel">
+          <div className="section-kicker">01 / WHAT IT'S GOOD FOR</div>
+          <h2>Put it to work</h2>
+          <ul className="check-list">
+            {tool.bestFor.map((item) => (
+              <li key={item}><Check size={17} />{item}</li>
+            ))}
+          </ul>
+
+          <div className="section-kicker section-kicker-spaced">
+            02 / TRY THESE TASKS
+          </div>
+          <div className="example-list">
+            {tool.useCases.map((item, index) => (
+              <div className="example-row" key={item}>
+                <span>0{index + 1}</span>
+                <p>{item}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <aside className="content-panel limitation-panel">
+          <div className="section-kicker">03 / GOOD TO KNOW</div>
+          <h2>Know the limits</h2>
+          <p>{tool.limitation}</p>
+          <div className="notice-box">
+            <ShieldCheck size={18} />
+            <span>
+              Use AI as a helper, not the final authority. Check important facts
+              and test technical work.
+            </span>
+          </div>
+          <div className="tag-list">
+            {tool.tags.map((tag) => (
+              <span key={tag}>#{tag.replaceAll(' ', '')}</span>
+            ))}
+          </div>
+        </aside>
+      </div>
+
+      {related.length > 0 && (
+        <section className="related-section">
+          <div className="section-heading">
+            <div>
+              <div className="eyebrow">KEEP EXPLORING</div>
+              <h2>Tools worth comparing</h2>
+            </div>
+            <Link to="/" className="text-link">
+              All tools <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="tool-grid related-grid">
+            {related.map((item, index) => (
+              <ToolCard key={item.id} tool={item} index={index} />
+            ))}
+          </div>
+        </section>
+      )}
+    </main>
+  );
+}
+
+function UseCasesPage() {
+  return (
+    <main className="page-shell usecase-page">
+      <div className="eyebrow">A BETTER PLACE TO START</div>
+      <h1>What are you trying to do?</h1>
+      <p className="page-intro">
+        Choose a task to see tools that can help. You don't need to know the AI
+        product names first.
+      </p>
+
+      <div className="usecase-grid">
+        {useCases.map((item, index) => {
+          const Icon = iconMap[item.icon] || Sparkles;
+
+          return (
+            <article className="usecase-card" key={item.title}>
+              <span className="usecase-icon"><Icon size={22} /></span>
+              <span className="usecase-number">
+                TASK {String(index + 1).padStart(2, '0')}
+              </span>
+              <h2>{item.title}</h2>
+              <p>{item.description}</p>
+              <div className="usecase-tools">
+                {item.tools.map((id) => {
+                  const tool = tools.find((entry) => entry.id === id);
+
+                  return tool ? (
+                    <Link key={id} to={`/tools/${id}`}>
+                      {tool.name} <ArrowUpRight size={13} />
+                    </Link>
+                  ) : null;
+                })}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </main>
+  );
 }
 
 function HomePage() {
-  return <><main><section className="hero"><div className="hero-copy"><span className="eyebrow"><span className="status-dot" /> YOUR EVERYDAY DIGITAL TOOLKIT</span><h1>Less searching.<br /><span>More doing.</span></h1><p className="hero-description">Discover practical, easy-to-use tools that help you work smarter, learn faster, and get everyday tasks done.</p><div className="hero-actions"><a className="button button-primary" href="#directory">Explore the tools <span aria-hidden="true">→</span></a><a className="button button-secondary" href="/about/">Learn about us</a></div><div className="hero-note"><span className="check-mark">✓</span> Straightforward tools. No unnecessary complexity.</div></div><div className="hero-art" aria-hidden="true"><div className="art-orbit orbit-one"/><div className="art-orbit orbit-two"/><div className="art-window"><div className="window-dots"><i/><i/><i/></div><div className="art-window-label">YOUR WORKSPACE</div><div className="art-main-icon">✳</div><div className="art-line long"/><div className="art-line medium"/><div className="art-mini-grid"><span>✎<small>Write</small></span><span>⌘<small>Organize</small></span><span>↗<small>Create</small></span></div></div><span className="float-chip chip-one">✦ Find your flow</span><span className="float-chip chip-two">✓ Simple by design</span></div></section><div className="trust-strip"><span>MADE FOR EVERYDAY TASKS</span><span>✳ Easy to explore</span><span>↗ Practical and useful</span><span>⌘ One place to start</span></div><Directory /><section className="bottom-cta"><span className="eyebrow">START SOMEWHERE</span><h2>A better way to get things done.</h2><p>Explore the directory and find a tool for the task in front of you.</p><a className="button button-light" href="#directory">Browse all tools →</a></section></main></>;
-}
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All tools');
+  const [showAll, setShowAll] = useState(false);
+  const [sortBy, setSortBy] = useState('recommended');
 
-function InfoPage({ title, eyebrow, children }) {
-  return <main className="info-page section"><span className="eyebrow">{eyebrow}</span><h1>{title}</h1><div className="info-content">{children}</div><a className="button button-primary" href="/">Back to homepage</a></main>;
-}
+  const filteredTools = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
 
-function ToolPage({ tool }) {
-  const [text, setText] = useState('');
-  const [copiedMessage, setCopiedMessage] = useState('');
-  const [passwordLength, setPasswordLength] = useState(16);
-  const [generatedPassword, setGeneratedPassword] = useState('');
-  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
-  const charCount = text.length;
-  const [percentValue, setPercentValue] = useState('');
-  const [percentOf, setPercentOf] = useState('');
-  const [unitValue, setUnitValue] = useState('');
-  const [unitFrom, setUnitFrom] = useState('km');
-  const [unitTo, setUnitTo] = useState('mi');
-  const [studyTasks, setStudyTasks] = useState([]);
-  const [newTask, setNewTask] = useState('');
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('');
+    let result = tools.filter((tool) => {
+      const matchesCategory =
+        activeCategory === 'All tools' || tool.category === activeCategory;
 
-  function generatePassword() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*?';
-    const values = new Uint32Array(passwordLength);
-    window.crypto.getRandomValues(values);
-    setGeneratedPassword(Array.from(values, (value) => chars[value % chars.length]).join(''));
+      const searchable = [
+        tool.name,
+        tool.maker,
+        tool.category,
+        tool.tagline,
+        tool.description,
+        ...tool.tags,
+        ...tool.bestFor,
+        ...tool.useCases,
+      ].join(' ').toLowerCase();
+
+      return matchesCategory && (!query || searchable.includes(query));
+    });
+
+    if (sortBy === 'az') {
+      result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return result;
+  }, [searchTerm, activeCategory, sortBy]);
+
+  const displayedTools =
+    showAll || searchTerm || activeCategory !== 'All tools'
+      ? filteredTools
+      : filteredTools.slice(0, 8);
+
+  function chooseCategory(category) {
+    setActiveCategory(category);
+    setShowAll(true);
   }
-  async function copyText(value) {
-    try { await navigator.clipboard.writeText(value); setCopiedMessage('Copied to clipboard.'); }
-    catch { setCopiedMessage('Select and copy the result manually.'); }
-  }
 
-  return <main className="info-page tool-page section"><a className="back-link" href="/#directory">← Back to all tools</a><span className="eyebrow">{tool.category.toUpperCase()} TOOL</span><h1>{tool.name}</h1><p className="tool-intro">{tool.description}</p><div className="tool-workspace">
-    {tool.id === 'word-counter' && <><label className="field-label" htmlFor="word-text">Enter or paste your text</label><textarea id="word-text" rows="9" value={text} onChange={(event) => setText(event.target.value)} placeholder="Start typing here…"/><div className="stats-row"><div><b>{wordCount}</b><span>Words</span></div><div><b>{charCount}</b><span>Characters</span></div><div><b>{text.trim() ? text.trim().split(/[.!?]+/).filter(Boolean).length : 0}</b><span>Sentences</span></div></div></>}
-    {tool.id === 'password-generator' && <><label className="field-label" htmlFor="password-length">Password length: {passwordLength}</label><input id="password-length" type="range" min="8" max="40" value={passwordLength} onChange={(event) => setPasswordLength(Number(event.target.value))}/><button className="button button-primary" onClick={generatePassword} type="button">Generate secure password</button>{generatedPassword && <div className="result-box"><code>{generatedPassword}</code><button className="button button-secondary" onClick={() => copyText(generatedPassword)} type="button">Copy</button></div>}{copiedMessage && <p className="success-message" role="status">{copiedMessage}</p>}<p className="helper-text">Your password is generated locally in this browser and is not sent to a server.</p></>}
-    {tool.id === 'percentage-calculator' && <><div className="form-grid"><label className="field-label">What percentage? <input type="number" value={percentValue} onChange={(event) => setPercentValue(event.target.value)} placeholder="e.g. 20"/></label><label className="field-label">Of what number? <input type="number" value={percentOf} onChange={(event) => setPercentOf(event.target.value)} placeholder="e.g. 1500"/></label></div><div className="calculation-result"><span>Result</span><b>{percentValue !== '' && percentOf !== '' && Number.isFinite(Number(percentValue) * Number(percentOf) / 100) ? (Number(percentValue) * Number(percentOf) / 100).toLocaleString(undefined, { maximumFractionDigits: 6 }) : '—'}</b></div></>}
-    {tool.id === 'unit-converter' && <><label className="field-label">Value <input type="number" value={unitValue} onChange={(event) => setUnitValue(event.target.value)} placeholder="Enter a value"/></label><div className="form-grid"><label className="field-label">From <select value={unitFrom} onChange={(event) => setUnitFrom(event.target.value)}><option value="km">Kilometres</option><option value="mi">Miles</option><option value="kg">Kilograms</option><option value="lb">Pounds</option><option value="c">Celsius</option><option value="f">Fahrenheit</option></select></label><label className="field-label">To <select value={unitTo} onChange={(event) => setUnitTo(event.target.value)}><option value="km">Kilometres</option><option value="mi">Miles</option><option value="kg">Kilograms</option><option value="lb">Pounds</option><option value="c">Celsius</option><option value="f">Fahrenheit</option></select></label></div><div className="calculation-result"><span>Converted value</span><b>{unitValue !== '' && unitFrom === unitTo ? Number(unitValue).toLocaleString() : unitValue !== '' && unitFrom === 'km' && unitTo === 'mi' ? (Number(unitValue) * 0.621371).toLocaleString(undefined, { maximumFractionDigits: 6 }) : unitValue !== '' && unitFrom === 'mi' && unitTo === 'km' ? (Number(unitValue) / 0.621371).toLocaleString(undefined, { maximumFractionDigits: 6 }) : unitValue !== '' && unitFrom === 'kg' && unitTo === 'lb' ? (Number(unitValue) * 2.20462).toLocaleString(undefined, { maximumFractionDigits: 6 }) : unitValue !== '' && unitFrom === 'lb' && unitTo === 'kg' ? (Number(unitValue) / 2.20462).toLocaleString(undefined, { maximumFractionDigits: 6 }) : unitValue !== '' && unitFrom === 'c' && unitTo === 'f' ? (Number(unitValue) * 9 / 5 + 32).toLocaleString(undefined, { maximumFractionDigits: 6 }) : unitValue !== '' && unitFrom === 'f' && unitTo === 'c' ? ((Number(unitValue) - 32) * 5 / 9).toLocaleString(undefined, { maximumFractionDigits: 6 }) : '—'}</b></div><p className="helper-text">Conversions are provided for the listed unit pairs.</p></>}
-    {tool.id === 'resume-builder' && <><p className="helper-text">Fill in your details to create a simple resume draft you can copy into a document.</p><div className="form-grid"><label className="field-label">Full name <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Your name"/></label><label className="field-label">Target role <input value={role} onChange={(event) => setRole(event.target.value)} placeholder="e.g. Software intern"/></label></div><label className="field-label">Summary / skills <textarea rows="5" value={text} onChange={(event) => setText(event.target.value)} placeholder="Add your skills, education, and experience…"/></label><div className="result-box resume-preview"><pre>{`${name || 'Your Name'}\n${role || 'Target Role'}\n\nPROFILE & SKILLS\n${text || 'Add your profile and skills above.'}`}</pre><button className="button button-secondary" onClick={() => copyText(`${name || 'Your Name'}\n${role || 'Target Role'}\n\nPROFILE & SKILLS\n${text}`)} type="button">Copy draft</button></div>{copiedMessage && <p className="success-message" role="status">{copiedMessage}</p>}</>}
-    {tool.id === 'study-planner' && <><form onSubmit={(event) => { event.preventDefault(); if (newTask.trim()) { setStudyTasks((tasks) => [...tasks, { id: Date.now(), text: newTask.trim(), done: false }]); setNewTask(''); } }} className="task-form"><input value={newTask} onChange={(event) => setNewTask(event.target.value)} placeholder="Add a study task…" aria-label="New study task"/><button className="button button-primary" type="submit">Add task</button></form><ul className="task-list">{studyTasks.map((task) => <li key={task.id}><label><input type="checkbox" checked={task.done} onChange={() => setStudyTasks((tasks) => tasks.map((item) => item.id === task.id ? { ...item, done: !item.done } : item))}/><span className={task.done ? 'task-done' : ''}>{task.text}</span></label><button type="button" className="remove-task" onClick={() => setStudyTasks((tasks) => tasks.filter((item) => item.id !== task.id))} aria-label={`Remove ${task.text}`}>×</button></li>)}</ul>{studyTasks.length === 0 && <p className="helper-text">Your study tasks will appear here. Tasks stay in this page session.</p>}</>}
-    {tool.id === 'bio-generator' && <><label className="field-label">A few details about you <textarea rows="4" value={text} onChange={(event) => setText(event.target.value)} placeholder="Your interests, role, or personality…"/></label><div className="result-box"><p>{text.trim() ? `${text.trim().replace(/[.!?]+$/, '')}. Curious mind. Always learning. ✨` : 'Your bio idea will appear here when you enter a few details.'}</p>{text.trim() && <button className="button button-secondary" onClick={() => copyText(`${text.trim().replace(/[.!?]+$/, '')}. Curious mind. Always learning. ✨`)} type="button">Copy bio</button>}</div>{copiedMessage && <p className="success-message" role="status">{copiedMessage}</p>}</>}
-    {tool.id === 'focus-timer' && <FocusTimer />}
-  </div></main>;
+  return (
+    <main>
+      <section className="hero">
+        <div className="hero-grid">
+          <div className="hero-copy">
+            <div className="hero-badge">
+              <span className="badge-pulse" />
+              YOUR PRACTICAL AI TOOLKIT
+            </div>
+            <h1>Find the right AI.<br /><span>Do better work.</span></h1>
+            <p className="hero-description">
+              A clear, curated guide to useful AI tools for coding, research,
+              engineering and learning — including what you can use for free.
+            </p>
+            <div className="hero-actions">
+              <a className="button button-dark" href="#directory">
+                Explore the directory <ArrowDownRight size={17} />
+              </a>
+              <Link className="button button-light" to="/use-cases">
+                Find tools by task <ArrowRight size={17} />
+              </Link>
+            </div>
+            <div className="hero-proof">
+              <div className="avatar-stack">
+                <span>AI</span><span>{'</>'}</span><span>⚙</span>
+              </div>
+              <p>
+                <b>Less hype. More useful.</b><br />
+                Practical notes for real projects.
+              </p>
+            </div>
+          </div>
+
+          <div className="hero-visual">
+            <div className="visual-orbit orbit-one" />
+            <div className="visual-orbit orbit-two" />
+            <div className="visual-center">
+              <span className="visual-spark"><Sparkles size={28} /></span>
+              <span>AI</span><small>TOOLKIT</small>
+            </div>
+            <div className="float-chip chip-chat">
+              <span className="mini-mark mint-mark">✳</span>
+              <div><b>ChatGPT</b><small>Learn &amp; build</small></div>
+              <span className="chip-check"><Check size={13} /></span>
+            </div>
+            <div className="float-chip chip-code">
+              <span className="mini-mark violet-mark">⌘</span>
+              <div><b>Copilot</b><small>Write better code</small></div>
+            </div>
+            <div className="float-chip chip-research">
+              <span className="mini-mark cyan-mark">⌕</span>
+              <div><b>Research</b><small>Find reliable sources</small></div>
+            </div>
+            <div className="visual-caption">
+              <span className="caption-dot" /> A smarter starting point
+            </div>
+          </div>
+        </div>
+
+        <div className="hero-bottom">
+          <span>BUILT FOR CURIOUS MINDS</span>
+          <div>
+            <span>Students</span><span>Developers</span><span>Builders</span>
+            <span>Problem-solvers</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="directory-section page-shell" id="directory">
+        <div className="section-heading directory-heading">
+          <div>
+            <div className="eyebrow">THE DIRECTORY</div>
+            <h2>Meet your new toolkit.</h2>
+            <p>Useful tools, clearly explained. Start with the task, not the hype.</p>
+          </div>
+          <div className="tool-count">
+            <b>{String(tools.length).padStart(2, '0')}</b>
+            <span>TOOLS TO<br />EXPLORE</span>
+          </div>
+        </div>
+
+        <div className="search-row">
+          <label className="search-box">
+            <Search size={19} />
+            <input
+              value={searchTerm}
+              onChange={(event) => {
+                setSearchTerm(event.target.value);
+                setShowAll(true);
+              }}
+              placeholder="Search tools, tasks, or skills..."
+              aria-label="Search tools"
+            />
+            {searchTerm && (
+              <button onClick={() => setSearchTerm('')} aria-label="Clear search">
+                <X size={16} />
+              </button>
+            )}
+            <kbd>Ctrl K</kbd>
+          </label>
+
+          <label className="sort-control">
+            <Filter size={16} />
+            <span className="sort-label">Sort</span>
+            <select
+              value={sortBy}
+              onChange={(event) => setSortBy(event.target.value)}
+              aria-label="Sort tools"
+            >
+              <option value="recommended">Recommended</option>
+              <option value="az">A to Z</option>
+            </select>
+            <ChevronDown size={14} />
+          </label>
+        </div>
+
+        <div className="category-row" role="group" aria-label="Filter by category">
+          {categories.map((category) => (
+            <button
+              key={category}
+              className={
+                activeCategory === category
+                  ? 'category-button selected'
+                  : 'category-button'
+              }
+              onClick={() => chooseCategory(category)}
+            >
+              {category}
+              {category === 'All tools' && <span>{tools.length}</span>}
+            </button>
+          ))}
+        </div>
+
+        <div className="results-line">
+          <span>{filteredTools.length} {filteredTools.length === 1 ? 'tool' : 'tools'} found</span>
+          <span>Independent guide · No account needed</span>
+        </div>
+
+        {displayedTools.length ? (
+          <div className="tool-grid">
+            {displayedTools.map((tool, index) => (
+              <ToolCard key={tool.id} tool={tool} index={index} />
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <Search size={28} />
+            <h3>No tools found</h3>
+            <p>Try another search or clear your category filter.</p>
+            <button
+              className="button button-dark"
+              onClick={() => {
+                setSearchTerm('');
+                setActiveCategory('All tools');
+                setShowAll(false);
+              }}
+            >
+              Reset filters
+            </button>
+          </div>
+        )}
+
+        {!showAll && filteredTools.length > displayedTools.length && (
+          <div className="load-more-wrap">
+            <button className="button button-outline" onClick={() => setShowAll(true)}>
+              Explore all {filteredTools.length} tools <ArrowRight size={17} />
+            </button>
+          </div>
+        )}
+      </section>
+
+      <section className="usecase-band">
+        <div className="page-shell usecase-band-inner">
+          <div className="usecase-intro">
+            <div className="eyebrow eyebrow-light">START WITH YOUR GOAL</div>
+            <h2>Not sure which tool<br />you need?</h2>
+            <p>Tell us what you're working on. We'll point you toward a useful place to start.</p>
+            <Link to="/use-cases" className="button button-white">
+              Find by task <ArrowRight size={17} />
+            </Link>
+          </div>
+
+          <div className="quick-tasks">
+            {useCases.slice(0, 4).map((item) => {
+              const Icon = iconMap[item.icon] || Zap;
+
+              return (
+                <Link className="quick-task" to="/use-cases" key={item.title}>
+                  <span className="quick-task-icon"><Icon size={19} /></span>
+                  <span><b>{item.title}</b><small>{item.description}</small></span>
+                  <ArrowUpRight size={17} className="quick-arrow" />
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="how-section page-shell" id="how-it-works">
+        <div className="section-heading">
+          <div>
+            <div className="eyebrow">OUR APPROACH</div>
+            <h2>Clarity over complexity.</h2>
+            <p>AI should help you get moving, not make things more confusing.</p>
+          </div>
+        </div>
+        <div className="principle-grid">
+          <article>
+            <span className="principle-icon"><Search size={21} /></span>
+            <span className="principle-no">01</span>
+            <h3>Find what fits</h3>
+            <p>Search by tool, task, or the problem you're trying to solve.</p>
+          </article>
+          <article>
+            <span className="principle-icon"><BookOpen size={21} /></span>
+            <span className="principle-no">02</span>
+            <h3>Understand the trade-offs</h3>
+            <p>Know what a tool does and where its free plan has limits.</p>
+          </article>
+          <article>
+            <span className="principle-icon"><ShieldCheck size={21} /></span>
+            <span className="principle-no">03</span>
+            <h3>Verify before you trust</h3>
+            <p>Check important claims, especially in code and engineering.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  );
 }
 
-function FocusTimer() {
-  const [minutes, setMinutes] = useState(25);
-  const [secondsLeft, setSecondsLeft] = useState(25 * 60);
-  const [running, setRunning] = useState(false);
-  useEffect(() => {
-    if (!running) return undefined;
-    const timerId = window.setInterval(() => {
-      setSecondsLeft((current) => {
-        if (current <= 1) {
-          window.clearInterval(timerId);
-          setRunning(false);
-          return 0;
-        }
-        return current - 1;
-      });
-    }, 1000);
-    return () => window.clearInterval(timerId);
-  }, [running]);
-  const display = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
-  return <div className="timer-panel"><div className="timer-display" aria-live="polite">{display}</div><label className="field-label">Session length (minutes)<select value={minutes} disabled={running} onChange={(event) => { const value = Number(event.target.value); setMinutes(value); setSecondsLeft(value * 60); }}><option value="15">15 minutes</option><option value="25">25 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option></select></label><div className="hero-actions"><button className="button button-primary" type="button" onClick={() => setRunning(true)} disabled={running || secondsLeft === 0}>{running ? 'Focus session running…' : 'Start focus session'}</button><button className="button button-secondary" type="button" onClick={() => { setRunning(false); setSecondsLeft(minutes * 60); }} >Reset</button></div><p className="helper-text">Keep this tab open while you focus.</p></div>;
+function Footer() {
+  return (
+    <footer className="site-footer">
+      <div className="footer-main page-shell">
+        <Logo />
+        <p>
+          A practical starting point for exploring AI tools.<br />
+          Built for people who want to learn, make and solve.
+        </p>
+        <div className="footer-links">
+          <Link to="/">Discover</Link>
+          <Link to="/use-cases">Use cases</Link>
+          <a href="https://chatgpt.com/" target="_blank" rel="noreferrer">
+            ChatGPT <ArrowUpRight size={13} />
+          </a>
+        </div>
+      </div>
+      <div className="footer-bottom page-shell">
+        <span>© {new Date().getFullYear()} TechGuide Lab</span>
+        <span>Independent directory · No database · No account required</span>
+        <span>Free-plan details can change; verify with providers.</span>
+      </div>
+    </footer>
+  );
 }
 
 export default function App() {
-  const path = window.location.pathname.replace(/\/+$/, '') || '/';
-  const toolMatch = path.match(/^\/tools\/([^/]+)$/);
-  const selectedTool = toolMatch ? TOOLS.find((tool) => tool.id === toolMatch[1]) : null;
-  let page;
-  if (selectedTool) page = <ToolPage tool={selectedTool} />;
-  else if (path === '/about') page = <InfoPage eyebrow="ABOUT TECHGUIDE LAB" title="Useful tools. Clear guidance."><p>TechGuide Lab is a simple directory of practical digital tools designed to help people get everyday tasks done with less friction.</p><p>Our goal is to make useful technology easier to discover and easier to use. We aim for clear descriptions, straightforward interfaces, and tools that focus on a real task.</p></InfoPage>;
-  else if (path === '/contact') page = <InfoPage eyebrow="GET IN TOUCH" title="Contact us"><p>Have a suggestion, spotted an issue, or want to recommend a tool? We welcome feedback that helps make TechGuide Lab more useful.</p><p>For now, you can share feedback by opening an issue in the project's public repository or using the contact method listed by the site owner.</p></InfoPage>;
-  else if (path === '/privacy') page = <InfoPage eyebrow="YOUR PRIVACY" title="Privacy policy"><p>TechGuide Lab is a directory of browser-based tools. Some tools process the information you enter locally in your browser. Do not enter sensitive personal information into any online tool unless you understand how it will be handled.</p><p>This starter site does not include a custom server or account system. Hosting providers, analytics, or advertising services added by the site owner may process data according to their own policies. Update this policy to accurately describe any services you enable before publishing.</p><p>For privacy questions, contact the site owner through the project's listed contact method.</p></InfoPage>;
-  else if (toolMatch && !selectedTool) page = <InfoPage eyebrow="TOOL NOT FOUND" title="We couldn't find that tool"><p>The link may be out of date, or the tool may have moved.</p></InfoPage>;
-  else page = <HomePage />;
+  const location = useLocation();
 
-  return <div className="app-shell"><Header />{page}<Footer /></div>;
+  return (
+    <div className="app-shell" key={location.pathname}>
+      <Header />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/tools/:id" element={<ToolDetail />} />
+        <Route path="/use-cases" element={<UseCasesPage />} />
+        <Route
+          path="*"
+          element={
+            <main className="page-shell not-found">
+              <div className="eyebrow">404 / PAGE NOT FOUND</div>
+              <h1>Looks like this page wandered off.</h1>
+              <Link className="button button-dark" to="/">
+                Back to TechGuide Lab <ArrowRight size={17} />
+              </Link>
+            </main>
+          }
+        />
+      </Routes>
+      <Footer />
+    </div>
+  );
 }
