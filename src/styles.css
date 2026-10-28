@@ -318,3 +318,38 @@ svg { flex-shrink: 0; }
   .footer-main { align-items: flex-start; flex-direction: column; gap: 15px; }
   .footer-bottom { flex-direction: column; }
 }
+
+/* TechGuide Lab — hero layout correction */
+.hero,
+.hero-section,
+.hero-layout {
+  box-sizing: border-box;
+}
+
+.hero *,
+.hero-section *,
+.hero-layout * {
+  box-sizing: border-box;
+}
+
+.hero,
+.hero-section,
+.hero-layout {
+  max-width: 100%;
+}
+
+.hero img,
+.hero-section img,
+.hero-layout img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .hero,
+  .hero-section,
+  .hero-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}
